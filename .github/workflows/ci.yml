@@ -35,6 +35,7 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
       - name: Write config file
         run: |
           echo "module.exports = {
@@ -54,8 +55,10 @@ jobs:
               apiKey: '${{ secrets.FACTORY_API_KEY }}',
             },
           };" > src/config.js
+
       - name: Test
-        run: npm test
+        run: npm run test
+
       - name: Set version
         id: set_version
         run: |
