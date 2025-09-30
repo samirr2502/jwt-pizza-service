@@ -89,6 +89,11 @@ test('createOrder', async () => {
     expect(createOrderRes.body).toMatchObject(expectedRes)
 })
 
+test('getOrder', async () =>{
+    const getOrderRes = await request(app).get('/api/order').
+        set('Authorization', `Bearer ${testUserAuthToken}`)
+    expect(getOrderRes.status).toBe(200)
+})
 
 
 
