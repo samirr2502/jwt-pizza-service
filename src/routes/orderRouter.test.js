@@ -22,6 +22,7 @@ let storeId;
 let orderId;
 let adminUser;
 let menuItemId;
+let testOrder;
 
 beforeAll(async () => {
     testUser.email = randomName() + '@test.com';
