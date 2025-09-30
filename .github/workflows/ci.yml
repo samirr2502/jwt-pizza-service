@@ -76,7 +76,7 @@ jobs:
         run: echo "SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Update coverage badge in README
         run: |
-          sed -i "s|https://pizza-factory.cs329.click/api/badge/samirr14/jwtpizzaservicecoverage.*|https://pizza-factory.cs329.click/api/badge/samirr14/jwtpizzaservicecoverage?sha=$SHA|" README.md
+          sed -i "s|https://pizza-factory.cs329.click/api/badge/samirr14/jwtpizzaservicecoverage.*|https://pizza-factory.cs329.click/api/badge/samirr14/jwtpizzaservicecoverage?sha=$SHA|)" README.md
       - name: Commit README update
         run: |
           git config user.name "github-actions"
