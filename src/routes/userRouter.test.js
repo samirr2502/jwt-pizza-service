@@ -24,7 +24,7 @@ test('getUser', async()=>{
 })
 
 test('updateUser', async()=>{
-    const updateUseRes = await request(app).put(`/api/user/${testUserId}`).set('Authorization', `Bearer ${testUserAuthToken}`).send(data=testUser)
+    const updateUseRes = await request(app).put(`/api/user/${testUserId}`).set('Authorization', `Bearer ${testUserAuthToken}`).send(testUser)
     expect(updateUseRes.status).toBe(200);
     
     const expectedUser = { ...testUser, roles: [{ role: 'diner' }] };
