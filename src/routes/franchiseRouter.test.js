@@ -5,31 +5,6 @@ if (process.env.VSCODE_INSPECTOR_OPTIONS) {
     jest.setTimeout(60 * 1000 * 5); // 5 minutes
 }
 
-/* Things I need to test franchiseRouter:
- *  getFranchises:
- *      query: page=0&limit=10&name=*
- *      testUser and authtoken
- *  getUserFranchises:
- *      query: :userId
- *      testUser and authtoken
- *  createFranchise:
- *      the franchise to be sent (not added to db yet)
- *      {"name": "pizzaPocketTest", "admins": [{"email": "f@jwt.com"}]}' 'Authorization: Bearer tttttt' 
- *  createStore:
- *      a franchise in the database
- *      query: :franchiseId/store
- *      {"franchiseId": 1, "name":"SLC"}' -H 'Authorization: Bearer tttttt'`,
- *  deleteFranchise:
- *      a franchise in the db
- *      query: franchiseId
- *      'Authorization: Bearer tttttt'
- *  deleteStore:
- *      a franchise and a store
- *      query: franchiseId/store/:storeId
- *      'Authorization: Bearer tttttt'`
- *      
-*/
-
 let adminUser;
 let adminUserAuthToken;
 const testFranchiseRandomName = randomName();
@@ -105,22 +80,24 @@ test('getUserFranchises', async () => {
 
 //deleteFranchise
 test('deleteFranchise', async () => {
-    const getUserFranchisesRes = (await request(app).delete(`/api/franchise/${franchiseId}`).
+    const deleteFranchiseRes = (await request(app).delete(`/api/franchise/${franchiseId}`).
         set('Authorization', `Bearer ${adminUserAuthToken}`))
-    expect(getUserFranchisesRes.status).toBe(200)
+    expect(deleteFranchiseRes.status).toBe(200)
 
     const expectedRes = { message: 'franchise deleted' }
-    expect(getUserFranchisesRes.body).toMatchObject(expectedRes)
+    expect(deleteFranchiseRes.body).toMatchObject(expectedRes)
 
 });
 //createStore
 test('createStore', async () => {
-     testFranchise.admins[0].email = adminUser.email
+    const deleteFranchiseRes = (await request(app).delete(`/api/franchise/${franchiseId}`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`))
+    expect(deleteFranchiseRes.status).toBe(200)
+
+    testFranchise.admins[0].email = adminUser.email
 
     const createFranchiseRes = (await request(app).post(`/api/franchise`).
         set('Authorization', `Bearer ${adminUserAuthToken}`).send(testFranchise))
-
-    // testFranchise.admins[0].email = adminUser.email
 
     expect(createFranchiseRes.status).toBe(200)
     franchiseId = createFranchiseRes.body.id
@@ -132,9 +109,27 @@ test('createStore', async () => {
     expect(createStoreRes.body).toMatchObject(expectedRes)
 });
 //deleteStore
-// test('deleteStore', async () => {
+test('deleteStore', async () => {
+    // //Setup
+    const deleteFranchiseRes = (await request(app).delete(`/api/franchise/${franchiseId}`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`))
+    expect(deleteFranchiseRes.status).toBe(200)
 
-// });
+    testFranchise.admins[0].email = adminUser.email
+    const createFranchiseRes = (await request(app).post(`/api/franchise`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`).send(testFranchise))
+    expect(createFranchiseRes.status).toBe(200)
+    franchiseId = createFranchiseRes.body.id
+    const createStoreRes = (await request(app).post(`/api/franchise/${franchiseId}/store`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`).send(testStore));
+    expect(createStoreRes.status).toBe(200);
+    storeId = createStoreRes.body.id
+
+    //Test deleteStore
+    const deleteStoreRes = (await request(app).delete(`/api/franchise/${franchiseId}/store/${storeId}`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`));
+        expect(deleteStoreRes.status).toBe(200)
+});
 function expectValidJwt(potentialJwt) {
     expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }
