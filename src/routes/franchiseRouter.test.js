@@ -105,7 +105,7 @@ test('createStore', async () => {
         set('Authorization', `Bearer ${adminUserAuthToken}`).send(testStore));
     expect(createStoreRes.status).toBe(200);
     storeId = createStoreRes.body.id
-    expectedRes = { id: storeId, name: testStoreRandomName }
+    const expectedRes = { id: storeId, name: testStoreRandomName }
     expect(createStoreRes.body).toMatchObject(expectedRes)
 });
 //deleteStore
