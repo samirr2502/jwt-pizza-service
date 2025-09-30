@@ -1,5 +1,5 @@
-const request = require('supertest');
-const app = require('../service');
+// const request = require('supertest');
+// const app = require('../service');
 
 /* Things I need to test franchiseRouter:
  *  getFranchises:
@@ -26,16 +26,16 @@ const app = require('../service');
  *      
 */
 
-const testUser = { name: 'testPizza_franchise', email: 'reg@test.com', password: 'a' };
-let testUserAuthToken;
-let testFranchise;
-beforeAll(async () => {
-    // testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
-    // const registerRes = await request(app).post('/api/auth').send(testUser);
-    // testUserAuthToken = registerRes.body.token;
-    // expectValidJwt(testUserAuthToken);
+// const testUser = { name: 'testPizza_franchise', email: 'reg@test.com', password: 'a' };
+// let testUserAuthToken;
+// let testFranchise;
+// beforeAll(async () => {
+//     // testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
+//     // const registerRes = await request(app).post('/api/auth').send(testUser);
+//     // testUserAuthToken = registerRes.body.token;
+//     // expectValidJwt(testUserAuthToken);
 
-});
+// });
 
 //getFranchises
 // test('getFranchises', async () => {
@@ -72,6 +72,6 @@ beforeAll(async () => {
 // test('deleteStore', async () => {
 
 // });
-function expectValidJwt(potentialJwt) {
-    expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
-}
+// function expectValidJwt(potentialJwt) {
+//     expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
+// }
