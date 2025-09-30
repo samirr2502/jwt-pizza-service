@@ -1,5 +1,9 @@
 const request = require('supertest');
 const app = require('../service');
+const { Role, DB } = require('../database/database.js');
+if (process.env.VSCODE_INSPECTOR_OPTIONS) {
+  jest.setTimeout(60 * 1000 * 5); // 5 minutes
+}
 
 /* Things I need to test franchiseRouter:
  *  getFranchises:
@@ -26,16 +30,24 @@ const app = require('../service');
  *      
 */
 
-const testUser = { name: 'testPizza_franchise', email: 'reg@test.com', password: 'a' };
-let testUserAuthToken;
+let adminUser;
+let adminUserAuthToken;
+const testFranchiseRandomName = randomName()
+const testFranchise = { name: testFranchiseRandomName, admins: [{ email: "f@jwt.com" }] }
 let userId;
-// let testFranchise;
 beforeAll(async () => {
-    testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
-    const registerRes = await request(app).post('/api/auth').send(testUser);
-    testUserAuthToken = registerRes.body.token;
-    expectValidJwt(testUserAuthToken);
-    userId = registerRes.body.user.id;
+
+    //Login admin user
+    adminUser = await createAdminUser()
+
+    const loginRes = await request(app).put('/api/auth').send(adminUser);
+    expect(loginRes.status).toBe(200);
+
+    adminUserAuthToken = loginRes.body.token
+    expectValidJwt(adminUserAuthToken);
+    userId = loginRes.body.user.id;
+
+
 
 });
 
@@ -44,28 +56,38 @@ test('getFranchises', async () => {
     //Header:None
     //Body: user, query.page, query.limit, query.name);
     const getFranchisesRes = (await request(app).get('/api/franchise').
-        set('Authorization', `Bearer ${testUserAuthToken}`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`).
         query({ page: 0, limit: 10, name: 'pizzaPocket' }));
     expect(getFranchisesRes.status).toBe(200)
-    const expectedRes = {franchises:[], more:false}
+    const expectedRes = { franchises: [], more: false }
     expect(getFranchisesRes.body).toMatchObject(expectedRes)
     //Response: {[franchises, more]}
 });
 
 //getUserFranchises
 test('getUserFranchises', async () => {
-// header: 'Authorization: Bearer tttttt'
+    // header: 'Authorization: Bearer tttttt'
     const getUserFranchisesRes = (await request(app).get(`/api/franchise/${userId}`).
-            set('Authorization', `Bearer ${testUserAuthToken}`))
+        set('Authorization', `Bearer ${adminUserAuthToken}`))
     expect(getUserFranchisesRes.status).toBe(200);
     const expectedRes = []
     expect(getUserFranchisesRes.body).toMatchObject(expectedRes)
 });
 
 //createFranchise
-// test('createFranchise', async () => {
+test('createFranchise', async () => {
+    testFranchise.admins[0].email = adminUser.email
 
-// });
+    const createFranchiseRes = (await request(app).post(`/api/franchise`).
+        set('Authorization', `Bearer ${adminUserAuthToken}`).send(testFranchise))
+
+    testFranchise.admins[0].email = adminUser.email
+
+    expect(createFranchiseRes.status).toBe(200)
+    const franchiseId = createFranchiseRes.body.id
+    const expectedFranchiseRes = {admins:[{email:adminUser.email,id:adminUser.id, name:adminUser.name}],id:franchiseId ,name:testFranchise.name}
+    expect(createFranchiseRes.body).toMatchObject(expectedFranchiseRes)
+});
 //deleteFranchise
 // test('deleteFranchise', async () => {
 
@@ -80,4 +102,16 @@ test('getUserFranchises', async () => {
 // });
 function expectValidJwt(potentialJwt) {
     expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
+}
+
+async function createAdminUser() {
+  let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
+  user.name = randomName();
+  user.email = user.name + '@admin.com';
+
+  user = await DB.addUser(user);
+  return { ...user, password: 'toomanysecrets' };
+}
+function randomName() {
+  return Math.random().toString(36).substring(2, 12);
 }
