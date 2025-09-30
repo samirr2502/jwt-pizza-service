@@ -35,6 +35,7 @@ let adminUserAuthToken;
 const testFranchiseRandomName = randomName()
 const testFranchise = { name: testFranchiseRandomName, admins: [{ email: "f@jwt.com" }] }
 let userId;
+let franchiseId;
 beforeAll(async () => {
 
     //Login admin user
@@ -60,7 +61,7 @@ test('createFranchise', async () => {
     testFranchise.admins[0].email = adminUser.email
 
     expect(createFranchiseRes.status).toBe(200)
-    const franchiseId = createFranchiseRes.body.id
+    franchiseId = createFranchiseRes.body.id
     const expectedFranchiseRes = { admins: [{ email: adminUser.email, id: adminUser.id, name: adminUser.name }], id: franchiseId, name: testFranchise.name }
     expect(createFranchiseRes.body).toMatchObject(expectedFranchiseRes)
 });
@@ -72,7 +73,7 @@ test('getFranchises', async () => {
         set('Authorization', `Bearer ${adminUserAuthToken}`).
         query({ page: 0, limit: 10, name: `${testFranchiseRandomName}` }).send(adminUser));
     expect(getFranchisesRes.status).toBe(200)
-    const expectedRes = { franchises: [{...testFranchise.admins[0].id = userId, id: getFranchisesRes.body.franchises[0].id, stores:[]}], more: false }
+    const expectedRes = { franchises: [{...testFranchise.admins[0].id = userId, id: franchiseId, stores:[]}], more: false }
     expect(getFranchisesRes.body).toMatchObject(expectedRes)
     //Response: {[franchises, more]}
 });
@@ -83,15 +84,20 @@ test('getUserFranchises', async () => {
     const getUserFranchisesRes = (await request(app).get(`/api/franchise/${userId}`).
         set('Authorization', `Bearer ${adminUserAuthToken}`))
     expect(getUserFranchisesRes.status).toBe(200);
-    const expectedRes = {body:[{...testFranchise.admins[0].id = userId, id: getUserFranchisesRes.body[0].id, stores:[]}] }
+    const expectedRes = {body:[{...testFranchise.admins[0].id = userId, id:franchiseId, stores:[]}] }
     expect(getUserFranchisesRes).toMatchObject(expectedRes)
 });
 
 
 //deleteFranchise
-// test('deleteFranchise', async () => {
+test('deleteFranchise', async () => {
+    const getUserFranchisesRes = (await request(app).delete(`/api/franchise/${franchiseId}`).
+    set('Authorization', `Bearer ${adminUserAuthToken}`))
+    expect(getUserFranchisesRes.status).toBe(200)
+    const expectedRes = { message: 'franchise deleted' }
+    expect(getUserFranchisesRes.body).toMatchObject(expectedRes)
 
-// });
+});
 //createStore
 // test('createStore', async () => {
 
