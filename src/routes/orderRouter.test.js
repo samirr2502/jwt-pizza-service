@@ -1,9 +1,9 @@
+
+const {expectValidJwt, randomName, createAdminUser,dropDatabase} = require('./test_utilities.js')
 const request = require('supertest');
 const app = require('../service');
-const { Role, DB } = require('../database/database.js');
-if (process.env.VSCODE_INSPECTOR_OPTIONS) {
-    jest.setTimeout(60 * 1000 * 5); // 5 minutes
-}
+
+
 
 const testUser = { name: 'testPizza', email: 'reg@test.com', password: 'a' };
 const testFranchiseRandomName = randomName();
@@ -56,7 +56,9 @@ beforeAll(async () => {
     testOrder = { franchiseId: franchiseId, storeId: storeId, items: [{ menuId: 1, description: "Two Topping, no sauce, just carbs", price: 0.0001 }] }
 
 });
-
+afterAll(async ()=>{
+  await dropDatabase()
+})
 test('getMenu', async () => {
     const getMenuRes = await request(app).get('/api/order/menu');
     expect(getMenuRes.status).toBe(200);
@@ -96,18 +98,3 @@ test('getOrder', async () =>{
 })
 
 
-
-function expectValidJwt(potentialJwt) {
-    expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
-}
-function randomName() {
-    return Math.random().toString(36).substring(2, 12);
-}
-async function createAdminUser() {
-    let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
-    user.name = randomName();
-    user.email = user.name + '@admin.com';
-
-    user = await DB.addUser(user);
-    return { ...user, password: 'toomanysecrets' };
-}

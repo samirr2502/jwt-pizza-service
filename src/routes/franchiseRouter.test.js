@@ -1,9 +1,7 @@
 const request = require('supertest');
 const app = require('../service');
-const { Role, DB } = require('../database/database.js');
-if (process.env.VSCODE_INSPECTOR_OPTIONS) {
-    jest.setTimeout(60 * 1000 * 5); // 5 minutes
-}
+const {expectValidJwt, randomName, createAdminUser, dropDatabase} = require('./test_utilities.js')
+
 
 let adminUser;
 let adminUserAuthToken;
@@ -38,20 +36,10 @@ beforeAll(async () => {
     const expectedFranchiseRes = { admins: [{ email: adminUser.email, id: adminUser.id, name: adminUser.name }], id: franchiseId, name: testFranchise.name }
     expect(createFranchiseRes.body).toMatchObject(expectedFranchiseRes)
 });
-// //createFranchise
-// test('createFranchise', async () => {
-//     testFranchise.admins[0].email = adminUser.email
+afterAll(async ()=>{
+  await dropDatabase()
+})
 
-//     const createFranchiseRes = (await request(app).post(`/api/franchise`).
-//         set('Authorization', `Bearer ${adminUserAuthToken}`).send(testFranchise))
-
-//     // testFranchise.admins[0].email = adminUser.email
-
-//     expect(createFranchiseRes.status).toBe(200)
-//     franchiseId = createFranchiseRes.body.id
-//     const expectedFranchiseRes = { admins: [{ email: adminUser.email, id: adminUser.id, name: adminUser.name }], id: franchiseId, name: testFranchise.name }
-//     expect(createFranchiseRes.body).toMatchObject(expectedFranchiseRes)
-// });
 //getFranchises
 test('getFranchises', async () => {
     //Header:None
@@ -130,18 +118,3 @@ test('deleteStore', async () => {
         set('Authorization', `Bearer ${adminUserAuthToken}`));
         expect(deleteStoreRes.status).toBe(200)
 });
-function expectValidJwt(potentialJwt) {
-    expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
-}
-
-async function createAdminUser() {
-    let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
-    user.name = randomName();
-    user.email = user.name + '@admin.com';
-
-    user = await DB.addUser(user);
-    return { ...user, password: 'toomanysecrets' };
-}
-function randomName() {
-    return Math.random().toString(36).substring(2, 12);
-}

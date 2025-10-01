@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
-
+const {dropDatabase} =require('./test_utilities')
 const testUser = { name: 'testPizza', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 
@@ -10,7 +10,9 @@ beforeAll(async () => {
   testUserAuthToken = registerRes.body.token;
   expectValidJwt(testUserAuthToken);
 });
-
+afterAll(async ()=>{
+  await dropDatabase()
+})
 test('login', async () => {
   const loginRes = await request(app).put('/api/auth').send(testUser);
   expect(loginRes.status).toBe(200);

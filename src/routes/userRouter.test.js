@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
+const {expectValidJwt, dropDatabase} = require('./test_utilities.js')
 
 
 const testUser = { name: 'testPizza', email: 'reg@test.com', password: 'a' };
@@ -12,7 +13,9 @@ beforeAll(async () => {
   expectValidJwt(testUserAuthToken);
   testUserId = registerRes.body.user.id
 });
-
+afterAll(async ()=>{
+  await dropDatabase()
+})
 test('getUser', async()=>{
     const getUserRes = await request(app).get('/api/user/me').set('Authorization', `Bearer ${testUserAuthToken}`)
     expect(getUserRes.status).toBe(200);
@@ -32,7 +35,3 @@ test('updateUser', async()=>{
     expect(updateUseRes.body.user).toMatchObject(expectedUser);
 
 })
-
-function expectValidJwt(potentialJwt) {
-  expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
-}
