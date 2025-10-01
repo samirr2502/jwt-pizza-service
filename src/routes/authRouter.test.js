@@ -1,7 +1,10 @@
 const request = require('supertest');
 const app = require('../service');
-const {dropDatabase} =require('./test_utilities')
 const testUser = { name: 'testPizza', email: 'reg@test.com', password: 'a' };
+if (process.env.VSCODE_INSPECTOR_OPTIONS) {
+    jest.setTimeout(60 * 1000 * 5); // 5 minutes
+}
+
 let testUserAuthToken;
 
 beforeAll(async () => {
@@ -10,9 +13,7 @@ beforeAll(async () => {
   testUserAuthToken = registerRes.body.token;
   expectValidJwt(testUserAuthToken);
 });
-afterAll(async ()=>{
-  await dropDatabase()
-})
+
 test('login', async () => {
   const loginRes = await request(app).put('/api/auth').send(testUser);
   expect(loginRes.status).toBe(200);

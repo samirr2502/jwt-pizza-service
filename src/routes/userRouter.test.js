@@ -1,7 +1,9 @@
 const request = require('supertest');
 const app = require('../service');
-const {expectValidJwt, dropDatabase} = require('./test_utilities.js')
-
+const {expectValidJwt} = require('./test_utilities.js')
+if (process.env.VSCODE_INSPECTOR_OPTIONS) {
+    jest.setTimeout(60 * 1000 * 5); // 5 minutes
+}
 
 const testUser = { name: 'testPizza', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
@@ -13,9 +15,7 @@ beforeAll(async () => {
   expectValidJwt(testUserAuthToken);
   testUserId = registerRes.body.user.id
 });
-afterAll(async ()=>{
-  await dropDatabase()
-})
+
 test('getUser', async()=>{
     const getUserRes = await request(app).get('/api/user/me').set('Authorization', `Bearer ${testUserAuthToken}`)
     expect(getUserRes.status).toBe(200);

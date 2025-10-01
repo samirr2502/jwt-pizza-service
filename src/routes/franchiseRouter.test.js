@@ -1,7 +1,9 @@
 const request = require('supertest');
 const app = require('../service');
-const {expectValidJwt, randomName, createAdminUser, dropDatabase} = require('./test_utilities.js')
-
+const {expectValidJwt, randomName, createAdminUser} = require('./test_utilities.js')
+if (process.env.VSCODE_INSPECTOR_OPTIONS) {
+    jest.setTimeout(60 * 1000 * 5); // 5 minutes
+}
 
 let adminUser;
 let adminUserAuthToken;
@@ -36,9 +38,6 @@ beforeAll(async () => {
     const expectedFranchiseRes = { admins: [{ email: adminUser.email, id: adminUser.id, name: adminUser.name }], id: franchiseId, name: testFranchise.name }
     expect(createFranchiseRes.body).toMatchObject(expectedFranchiseRes)
 });
-afterAll(async ()=>{
-  await dropDatabase()
-})
 
 //getFranchises
 test('getFranchises', async () => {

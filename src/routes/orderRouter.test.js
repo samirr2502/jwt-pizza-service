@@ -1,8 +1,10 @@
 
-const {expectValidJwt, randomName, createAdminUser,dropDatabase} = require('./test_utilities.js')
+const {expectValidJwt, randomName, createAdminUser} = require('./test_utilities.js')
 const request = require('supertest');
 const app = require('../service');
-
+if (process.env.VSCODE_INSPECTOR_OPTIONS) {
+    jest.setTimeout(60 * 1000 * 5); // 5 minutes
+}
 
 
 const testUser = { name: 'testPizza', email: 'reg@test.com', password: 'a' };
@@ -56,9 +58,7 @@ beforeAll(async () => {
     testOrder = { franchiseId: franchiseId, storeId: storeId, items: [{ menuId: 1, description: "Two Topping, no sauce, just carbs", price: 0.0001 }] }
 
 });
-afterAll(async ()=>{
-  await dropDatabase()
-})
+
 test('getMenu', async () => {
     const getMenuRes = await request(app).get('/api/order/menu');
     expect(getMenuRes.status).toBe(200);
