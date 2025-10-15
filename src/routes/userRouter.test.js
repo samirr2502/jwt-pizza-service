@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../service');
-const {expectValidJwt, randomName, createAdminUser} = require('./test_utilities.js')
+const {expectValidJwt, createAdminUser} = require('./test_utilities.js')
 if (process.env.VSCODE_INSPECTOR_OPTIONS) {
     jest.setTimeout(60 * 1000 * 5); // 5 minutes
 }
@@ -43,7 +43,7 @@ test('list users', async () => {
     expect(loginRes.status).toBe(200);
     adminUserAuthToken = loginRes.body.token
     expectValidJwt(adminUserAuthToken);
-    userId = loginRes.body.user.id;
+    let userId = loginRes.body.user.id;
 
     const listUsersRes = await request(app).get('/api/user').set('Authorization', `Bearer ${adminUserAuthToken}`)
                     .query({ page: 0, limit: 10, name: adminUser.name })
