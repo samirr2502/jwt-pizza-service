@@ -56,7 +56,7 @@ test('list users', async () => {
 
 test('deleteUser', async () => {
     testUser.name = "name2"
-    const deleteUserRes = await request(app).delete(`/api/user/${testUserId}`).set('Authorization', `Bearer ${testUserAuthToken}`).send(testUser)
+    const deleteUserRes = await request(app).delete(`/api/user/${testUserId}`).set('Authorization', `Bearer ${adminUserAuthToken}`).send(adminUser)
     expect(deleteUserRes.status).toBe(200);
 
     // const expectedUser = { ...testUser, roles: [{ role: 'diner' }] };
