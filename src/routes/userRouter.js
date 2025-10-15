@@ -30,6 +30,14 @@ userRouter.docs = [
     example: `curl -X PUT localhost:3000/api/user/1 -d '{"name":"常用名字", "email":"a@jwt.com", "password":"admin"}' -H 'Content-Type: application/json' -H 'Authorization: Bearer tttttt'`,
     response: { user: { id: 1, name: '常用名字', email: 'a@jwt.com', roles: [{ role: 'admin' }] }, token: 'tttttt' },
   },
+  {
+    method: 'DELETE',
+    path: '/api/user/:userId',
+    requiresAuth: true,
+    description: 'Delete a user',
+    example: `curl -X GET localhost:3000/api/user -H 'Authorization: Bearer tttttt'`,
+    response: {}
+  },
 ];
 
 // getUser
@@ -43,12 +51,12 @@ userRouter.get(
 // listUsers
 userRouter.get(
   '/',
-    authRouter.authenticateToken,
+  authRouter.authenticateToken,
 
   asyncHandler(async (req, res) => {
 
-    const usersRes = await DB.getUsers(req.user,req.query.page, req.query.limit, req.query.name)
-    res.json({users:usersRes[0], more:usersRes[1]});
+    const usersRes = await DB.getUsers(req.user, req.query.page, req.query.limit, req.query.name)
+    res.json({ users: usersRes[0], more: usersRes[1] });
   })
 );
 
@@ -69,5 +77,15 @@ userRouter.put(
     res.json({ user: updatedUser, token: auth });
   })
 );
+// deleteUser
+userRouter.delete(
+  '/:userId',
+  authRouter.authenticateToken,
+  asyncHandler(async (req, res) => {
+    const userId = Number(req.params.userId);
+    const deleteUserRes = await DB.deleteUser(userId);
+    res.json({});
 
+  })
+);
 module.exports = userRouter;

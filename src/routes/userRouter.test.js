@@ -53,3 +53,14 @@ test('list users', async () => {
     expect(listUsersRes.status).toBe(200);
     expect(listUsersRes.body).toMatchObject(expectedUsersRes)
 });
+
+test('deleteUser', async () => {
+    testUser.name = "name2"
+    const deleteUserRes = await request(app).delete(`/api/user/${testUserId}`).set('Authorization', `Bearer ${testUserAuthToken}`).send(testUser)
+    expect(deleteUserRes.status).toBe(200);
+
+    // const expectedUser = { ...testUser, roles: [{ role: 'diner' }] };
+    // delete expectedUser.password;
+    // // expect(deleteUserRes)
+
+})

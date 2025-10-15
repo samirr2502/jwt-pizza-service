@@ -87,11 +87,8 @@ class DB {
       if (more) {
         users = users.slice(0, limit);
       }
-      const usersRes = []
       if (authUser?.isRole(Role.Admin)) {
-      for (const user of users) {
-          // const userRes=await this.getUser(user.email, user.password)
-          // usersRes.push(userRes);
+        for (const user of users) {
           user.roles = await this.query(connection, `SELECT role FROM userRole WHERE userId=?`, [user.id]);
           user.password = undefined
         }
@@ -125,6 +122,28 @@ class DB {
     }
   }
 
+  async deleteUser(userId) {
+    const connection = await this.getConnection();
+    try {
+      await connection.beginTransaction();
+      try {
+        await this.query(connection, `DELETE FROM userRole WHERE userId=?`, [userId]);
+        await this.query(connection, `DELETE FROM auth WHERE userId=?`, [userId]);
+
+        await this.query(connection, `DELETE FROM user WHERE id=?`, [userId]);
+
+        // await this.query(connection, `DELETE FROM store WHERE franchiseId=?`, [franchiseId]);
+        // await this.query(connection, `DELETE FROM franchise WHERE id=?`, [franchiseId]);
+        await connection.commit();
+      } catch (e){
+        console.log(e)
+        await connection.rollback();
+        throw new StatusCodeError('unable to delete user', 500);
+      }
+    } finally {
+      connection.end();
+    }
+  }
   async loginUser(userId, token) {
     token = this.getTokenSignature(token);
     const connection = await this.getConnection();
