@@ -51,7 +51,7 @@ beforeAll(async () => {
         set('Authorization', `Bearer ${adminUserAuthToken}`).send(testStore));
     expect(createStoreRes.status).toBe(200);
     storeId = createStoreRes.body.id
-
+ 
     testMenuItem = { title: "Student2", description: "One Topping, no sauce, just carbs", image: "pizza9.png", price: 0.0001 }
 
     testMenuItem2 = { title: "Student3", description: "Two Topping, no sauce, just carbs", image: "pizza9.png", price: 0.0001 }
