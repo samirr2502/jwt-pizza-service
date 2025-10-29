@@ -45,7 +45,7 @@ jobs:
                 host: '127.0.0.1',
                 user: 'root',
                 password: 'tempdbpassword',
-                database: 'jwt-pizza-service-db',
+                database: 'pizza',
                 connectTimeout: 60000,
               },
               listPerPage: 10,
