@@ -63,16 +63,10 @@ authRouter.post(
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
-    try {
       const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
       const auth = await setAuth(user);
-    } catch (err) {
-      metrics.authRequest("failed")
-    }
-    finally {
-      metrics.authRequest("success")
       res.json({ user: user, token: auth });
-    }
+  
   })
 );
 
@@ -81,11 +75,13 @@ authRouter.put(
   '/',
   asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+    let auth, user;
     try {
-      const user = await DB.getUser(email, password);
-      const auth = await setAuth(user);
+      user = await DB.getUser(email, password);
+      auth = await setAuth(user);
     } catch (err) {
-      metrics.authRequest("failed")
+      
+      metrics.authRequest(err)
     }
     finally {
       metrics.authRequest("success")
