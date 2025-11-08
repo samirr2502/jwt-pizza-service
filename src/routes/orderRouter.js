@@ -99,10 +99,9 @@ orderRouter.post(
     const j = await r.json();
     if (r.ok) {
       res.send({ order, followLinkToEndChaos: j.reportUrl, jwt: j.jwt });
-      
       metrics.pizzaPurchase("success",latency,price ,totalPizzas);
     } else {
-      metrics.pizzaPurchase("failure",latency,0,totalPizzas);
+      metrics.pizzaPurchase("failed",latency,0,totalPizzas);
 
       res.status(500).send({ message: 'Failed to fulfill order at factory', followLinkToEndChaos: j.reportUrl });
     }

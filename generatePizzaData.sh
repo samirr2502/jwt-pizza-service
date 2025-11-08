@@ -6,10 +6,10 @@ if [ -z "$1" ]; then
 fi
 host=$1
 
-response=$(curl -s -X PUT $host/api/auth -d '{"email":"a@jwt.com", "password":"admin"}' -H 'Content-Type: application/json')
+response=$(curl -s -X PUT $host/api/auth -d '{"email":"a@jwt.com", "password":"Klkdelomio25"}' -H 'Content-Type: application/json')
 token=$(echo $response | jq -r '.token')
 
-# # Add users
+# # Add use
 curl -X POST $host/api/auth -d '{"name":"pizza diner", "email":"d@jwt.com", "password":"diner"}' -H 'Content-Type: application/json'
 curl -X POST $host/api/auth -d '{"name":"pizza franchisee", "email":"f@jwt.com", "password":"franchisee"}' -H 'Content-Type: application/json'
 
