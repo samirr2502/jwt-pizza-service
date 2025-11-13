@@ -4,6 +4,7 @@ const config = require('../config.js');
 const { StatusCodeError } = require('../endpointHelper.js');
 const { Role } = require('../model/model.js');
 const dbModel = require('./dbModel.js');
+const { logger, sendLog } = require('./../logger.js');
 class DB {
   constructor() {
     this.initialized = this.initializeDatabase();
@@ -135,7 +136,7 @@ class DB {
         // await this.query(connection, `DELETE FROM store WHERE franchiseId=?`, [franchiseId]);
         // await this.query(connection, `DELETE FROM franchise WHERE id=?`, [franchiseId]);
         await connection.commit();
-      } catch (e){
+      } catch (e) {
         console.log(e)
         await connection.rollback();
         throw new StatusCodeError('unable to delete user', 500);
@@ -339,7 +340,19 @@ class DB {
   }
 
   async query(connection, sql, params) {
-    const [results] = await connection.execute(sql, params);
+    let results;
+    try {
+      [results] = await connection.execute(sql, params);
+      //Logging start
+      if (results) {
+        sendLog('info', 'db', { reqBody: sql })
+      } else {
+        sendLog('warn', 'db', { reqBody: sql })
+      }
+    } catch (Error) {
+      sendLog('error', 'db', { reqBody: sql })
+    }
+    //Logging ends
     return results;
   }
 

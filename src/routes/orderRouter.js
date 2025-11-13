@@ -5,6 +5,7 @@ const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 const metrics = require('../metrics.js')
 const orderRouter = express.Router();
+const { sendLog } = require('./../logger.js')
 
 orderRouter.docs = [
   {
@@ -80,30 +81,37 @@ orderRouter.post(
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
     let price = 0
-    let totalPizzas=0;
-    for (let item of order.items){
-      price+= item.price;
-      totalPizzas+=1
+    let totalPizzas = 0;
+    for (let item of order.items) {
+      price += item.price;
+      totalPizzas += 1
     }
     //start timer
-    const startTime = performance.now()
-    const r = await fetch(`${config.factory.url}/api/order`, {
+    const startTime = performance.now();
+    const request = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },
       body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
-    });
+    }
+    const r = await fetch(`${config.factory.url}/api/order`, request);
+
     //end timer
     const endTime = performance.now()
-    const latency = endTime-startTime
+    const latency = endTime - startTime
 
-    const j = await r.json();
-    if (r.ok) {
+    const clonedResponse = r.clone();
+    const responseBody = await clonedResponse.text(); // raw body for logging
+    const j = await r.json(); if (r.ok) {
       res.send({ order, followLinkToEndChaos: j.reportUrl, jwt: j.jwt });
-      metrics.pizzaPurchase("success",latency,price ,totalPizzas);
+      metrics.pizzaPurchase("success", latency, price, totalPizzas);
+      sendLog('info', 'factory', { reqBody: request.body, resBody: responseBody })
+
     } else {
-      metrics.pizzaPurchase("failed",latency,0,totalPizzas);
+      metrics.pizzaPurchase("failed", latency, 0, totalPizzas);
 
       res.status(500).send({ message: 'Failed to fulfill order at factory', followLinkToEndChaos: j.reportUrl });
+      sendLog('error', 'factory', { reqBody: request.body, resBody: responseBody })
+
     }
   })
 );
