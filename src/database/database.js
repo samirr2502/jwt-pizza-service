@@ -350,7 +350,7 @@ class DB {
         sendLog('warn', 'db', { reqBody: sql })
       }
     } catch (Error) {
-      sendLog('error', 'db', { reqBody: sql })
+      sendLog('error', 'db', { reqBody: sql, resBody: Error})
     }
     //Logging ends
     return results;
