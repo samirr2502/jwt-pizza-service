@@ -10,8 +10,8 @@ let totalRequests = 0;
 let totalActiveUsers = 0;
 let totalSuccessLogin = 0;
 let totalFailedLogin = 0;
-const INTERVAL =3000 //5 s
-const RESET_INTERVAL = 5;  //Reset at (interval * resetInterval) -> (e.g)5*6 =30 seconds
+const INTERVAL =5000 //5 s
+const RESET_INTERVAL = 24;  //Reset at (interval * resetInterval) -> (e.g)5*6 =30 seconds
 //pizza vairables
 let pizzaPurchaseLatency = 0;
 let requestsLatency = 0;
