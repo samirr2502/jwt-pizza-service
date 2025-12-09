@@ -5,6 +5,7 @@ const { asyncHandler } = require('../endpointHelper.js');
 const { DB, Role } = require('../database/database.js');
 const metrics = require('../metrics.js')
 const authRouter = express.Router();
+const { v4 } =require("uuid");
 
 authRouter.docs = [
   {
@@ -95,6 +96,7 @@ authRouter.delete(
 
 async function setAuth(user) {
   const token = jwt.sign(user, config.jwtSecret);
+  token.concat(v4())
   await DB.loginUser(user.id, token);
   return token;
 }
