@@ -5,7 +5,6 @@ const os = require('os');
 const requests = {};
 const activeUsers = {};
 let totalRequests = 0;
-
 //Auth varaibles
 let totalActiveUsers = 0;
 let totalSuccessLogin = 0;
